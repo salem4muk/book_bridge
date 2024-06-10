@@ -133,7 +133,7 @@ class _MyReservationScreenState extends State<MyReservationScreen> {
         ),
         Obx(() {
           if (_reservationController.isLoadingDelete.value) {
-            return LoadingOverlayHelper();
+            return const LoadingOverlayHelper();
           }
           return const SizedBox.shrink();
         }),

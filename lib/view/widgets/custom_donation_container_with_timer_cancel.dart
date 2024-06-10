@@ -124,6 +124,22 @@ class _CustomDonationContainerWithTimerState extends State<CustomDonationContain
                             .copyWith(color: primary)),
                   ],
                 ),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.numbers_sharp,
+                      color: mainText,
+                    ),
+                    SizedBox(
+                      width: 3.w,
+                    ),
+                    Text(widget.code.toString(),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium!
+                            .copyWith(color: primary)),
+                  ],
+                ),
               ],
             ),
             Column(
