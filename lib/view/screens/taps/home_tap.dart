@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:book_bridge/controllers/donation_controller.dart';
+import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -32,12 +35,31 @@ class _HomeTapState extends State<HomeTap> with AutomaticKeepAliveClientMixin {
   int currentPage = 1;
   final ScrollController _scrollController = ScrollController();
 
+  final List<String> _sentences = [
+    "لا بلد بعد فلسطين ولا عاصمة بعد القدس",
+    "فلسطين قظية الشرفاء",
+    "فلسطييييييييييييييييييييييين",
+    "القددددددددددددددددددس",
+  ];
+  int _currentIndexW = 0;
+  Timer? _timer;
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      setState(() {
+        _currentIndexW = (_currentIndexW + 1) % _sentences.length;
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    _startTimer();
     _fetchDonations();
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
         _loadMoreDonations();
       }
     });
@@ -47,7 +69,8 @@ class _HomeTapState extends State<HomeTap> with AutomaticKeepAliveClientMixin {
     setState(() {
       isLoading = true;
     });
-    List<dynamic> fetchedDonations = await _donationController.getLastDonations(currentPage);
+    List<dynamic> fetchedDonations =
+        await _donationController.getLastDonations(currentPage);
     setState(() {
       donations.addAll(fetchedDonations);
       isLoading = false;
@@ -64,6 +87,12 @@ class _HomeTapState extends State<HomeTap> with AutomaticKeepAliveClientMixin {
   }
 
   @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
   bool get wantKeepAlive => true;
 
   @override
@@ -74,19 +103,47 @@ class _HomeTapState extends State<HomeTap> with AutomaticKeepAliveClientMixin {
       child: Scaffold(
         body: SingleChildScrollView(
           controller: _scrollController,
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 20.h),
-            child: Column(
-              children: [
-                _buildSlider(),
-                SizedBox(height: 12.h),
-                _buildSliderDots(),
-                SizedBox(height: 25.h),
-                _buildSearchButton(),
-                _buildDonationItems(),
-                SizedBox(height: 15.h),
-              ],
-            ),
+          child: Column(
+            children: [
+              Container(
+                height: 35.h,
+                width: double.infinity,
+                color: outline,
+                alignment: Alignment.center,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      _sentences[_currentIndexW],
+                      style: Theme.of(context).textTheme.bodyText1,
+                    ),
+                    SizedBox(
+                      width: 5.w,
+                    ),
+                    CountryFlag.fromCountryCode(
+                      'PS',
+                      height: 20.h,
+                      width: 25.w,
+                      borderRadius: 4.r,
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 20.h),
+                child: Column(
+                  children: [
+                    _buildSlider(),
+                    SizedBox(height: 12.h),
+                    _buildSliderDots(),
+                    SizedBox(height: 25.h),
+                    _buildSearchButton(),
+                    _buildDonationItems(),
+                    SizedBox(height: 15.h),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -136,7 +193,6 @@ class _HomeTapState extends State<HomeTap> with AutomaticKeepAliveClientMixin {
         height: 50.h,
         onTap: () {
           Get.to(() => const SearchScreen());
-
         },
       ),
     );
